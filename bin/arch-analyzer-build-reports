@@ -1,0 +1,43 @@
+#!/usr/bin/env php
+<?php
+
+use ArchAnalyzer\ArchAnalyzerFacade;
+
+require_once dirname(__DIR__, 3) . '/autoload.php';
+
+$configPath = $argv[1] ?? dirname(__DIR__, 4) . '/arch-analyzer-config.php';
+$config = require $configPath;
+
+$reportsPath = $config['reports_dir'];
+recreateReportsDirectory($reportsPath);
+
+$analyzer = new ArchAnalyzerFacade($config);
+
+$allowedPaths = array_filter(explode(PHP_EOL, getenv('ARCH_ALLOWED_PATHS'))) ?: [];
+$analyzer->generateReport($reportsPath, $allowedPaths);
+
+echo PHP_EOL . 'Report: ' . $reportsPath . '/index.html' . PHP_EOL;
+
+
+// helpers
+
+function recreateReportsDirectory(string $path): void
+{
+    removeDirectory($path);
+    if (!mkdir($path) && !is_dir($path)) {
+        throw new \RuntimeException(sprintf('Directory "%s" was not created', $path));
+    }
+}
+
+function removeDirectory(string $path): void
+{
+    if (is_dir($path)) {
+        $files = glob($path . '/*');
+
+        foreach ($files as $file) {
+            is_dir($file) ? removeDirectory($file) : unlink($file);
+        }
+
+        rmdir($path);
+    }
+}

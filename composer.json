@@ -1,0 +1,38 @@
+{
+    "name": "arch/analyzer",
+    "type": "library",
+    "description": "Arch analyzer",
+    "license": "MIT",
+    "require": {
+        "psr/log": "*",
+        "twig/twig": "*",
+        "ext-json": "*",
+        "ext-mbstring": "*"
+    },
+    "require-dev": {
+        "phpstan/phpstan": "^0.12.90",
+        "squizlabs/php_codesniffer": "^3.6"
+    },
+    "autoload": {
+        "psr-4": {
+            "ArchAnalyzer\\": "src/"
+        }
+    },
+    "bin": [
+        "/bin/arch-analyzer-build-reports",
+        "/bin/arch-analyzer-check",
+        "/bin/arch-analyzer-allow-current-state"
+    ],
+    "scripts": {
+        "php-linter": "php -l bin && php -l src",
+        "code-sniffer": "vendor/bin/phpcs bin src",
+        "phpstan": "vendor/bin/phpstan analyse -l 8 bin src",
+        "arch-analise": "bin/arch-analise ./arch-analyzer-config.php",
+        "quality-checker": [
+            "@php-linter",
+            "@code-sniffer",
+            "@phpstan",
+            "@arch-analise"
+        ]
+    }
+}
